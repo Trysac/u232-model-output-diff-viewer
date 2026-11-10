@@ -9,4 +9,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- ### Added
+- Word-level diff, similarity scoring, JSON parsing, self-contained HTML rendering and a CLI runner.
 - Initial project structure from the factory utility template.

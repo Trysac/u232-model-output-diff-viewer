@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { greet } from "../src/index.js";
+import * as api from "../src/index.js";
 
-describe("greet", () => {
-  it("greets a trimmed name", () => {
-    expect(greet("  Ada ")).toBe("Hello, Ada!");
-  });
-
-  it("rejects an empty name", () => {
-    expect(() => greet("   ")).toThrow(TypeError);
+describe("public API", () => {
+  it("exports all required functions and types", () => {
+    expect(typeof api.wordDiff).toBe("function");
+    expect(typeof api.similarity).toBe("function");
+    expect(typeof api.parseComparison).toBe("function");
+    expect(typeof api.renderHtml).toBe("function");
+    expect(typeof api.run).toBe("function");
+    expect(typeof api.ViewerError).toBe("function");
   });
 });

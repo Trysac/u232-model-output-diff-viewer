@@ -1,20 +1,7 @@
-/**
- * Public entry point of @trysac/model-output-diff-viewer.
- *
- * Replace this placeholder with the utility's real API. Keep every export documented and covered by tests.
- */
-
-/**
- * Builds a greeting for `name`.
- *
- * @param name - Who to greet. Surrounding whitespace is ignored.
- * @returns The greeting, for example `"Hello, Ada!"`.
- * @throws {TypeError} When `name` is empty after trimming.
- */
-export function greet(name: string): string {
-  const trimmed = name.trim();
-  if (trimmed === "") {
-    throw new TypeError("name must not be empty");
-  }
-  return `Hello, ${trimmed}!`;
-}
+export { run } from "./cli.js";
+export { parseComparison } from "./compare.js";
+export type { ViewerErrorCode } from "./errors.js";
+export { ViewerError } from "./errors.js";
+export { renderHtml } from "./html.js";
+export type { Comparison, ComparisonCase, DiffOp } from "./types.js";
+export { similarity, wordDiff } from "./worddiff.js";

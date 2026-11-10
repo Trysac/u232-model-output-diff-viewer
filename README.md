@@ -1,55 +1,42 @@
-# model-output-diff-viewer
+# @trysac/model-output-diff-viewer
 
-[![npm version](https://img.shields.io/npm/v/@trysac/model-output-diff-viewer.svg)](https://www.npmjs.com/package/@trysac/model-output-diff-viewer)
-[![license: MIT](https://img.shields.io/npm/l/@trysac/model-output-diff-viewer.svg)](LICENSE)
-[![CI](https://github.com/Trysac/u232-model-output-diff-viewer/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u232-model-output-diff-viewer/actions/workflows/ci.yml)
+Render outputs of several models for the same prompts as one static, script-free HTML page with word-level diffs against a baseline model and similarity scores.
 
-Render outputs of several models for the same prompts as one static, script-free HTML page with word-level diffs against a baseline model and similarity scores
+## Installation
 
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and why existing
-packages do not solve it well. Keep it factual; link to an issue or decision record when there is one.
-
-## Install
-
-```sh
+```bash
 npm install @trysac/model-output-diff-viewer
 ```
-
-Requires Node.js 20 or newer. The package ships ES modules with TypeScript declarations.
 
 ## Usage
 
 ```ts
-import { greet } from "@trysac/model-output-diff-viewer";
+import { readFile } from "node:fs/promises";
+import { parseComparison, renderHtml } from "@trysac/model-output-diff-viewer";
 
-// Build a greeting; surrounding whitespace is ignored.
-const message = greet("  Ada ");
-console.log(message); // "Hello, Ada!"
-
-try {
-  greet("   ");
-} catch (error) {
-  console.error((error as Error).message); // "name must not be empty"
-}
+const json = await readFile("comparison.json", "utf8");
+const comparison = parseComparison(json);
+const html = renderHtml(comparison, { title: "Prompt eval" });
+console.log(html);
 ```
+
+The input file is a JSON object with optional `title`, a `baseline` model name and a `cases` array. Each case has a string `id`, a string `prompt` and an `outputs` object mapping model names to string outputs. `parseComparison` validates that shape and the limits below before any HTML is rendered.
 
 ## API
 
-| Export | Signature | Description |
-|---|---|---|
-| `greet` | `(name: string) => string` | Placeholder API; replace it with the real one. |
+The public entry point is `src/index.ts`.
 
-## Development
+- `wordDiff(a: string, b: string, opts?: { maxCells?: number }): DiffOp[]` returns ordered `{ op: "equal" | "delete" | "insert"; text: string }` operations. Tokens are whitespace runs and non-whitespace runs. The default `maxCells` is `4_000_000`; when the product of token counts exceeds it, the result is one delete of `a` and one insert of `b` (empty sides are omitted). An invalid `maxCells` throws `ViewerError` with code `invalid_comparison`.
+- `similarity(a: string, b: string): number` returns `2 * equalTokens / (tokensA + tokensB)`, `1` when both sides are empty. It has no cell budget.
+- `parseComparison(json: string, opts?: { maxBytes?: number }): Comparison` parses and validates the document. The default byte limit is `10_000_000` UTF-8 bytes; there are at most `5_000` cases and at most `8` distinct models. If there is at least one case, the baseline must appear in some case output.
+- `renderHtml(c: Comparison, opts?: { title?: string }): string` returns one self-contained HTML document. Models are columns in first-seen order with the baseline first. The renderer uses a fixed `4_000_000` token-product budget per cell; above it the cell shows `diff skipped: too large` and `similarity skipped: too large` instead of a diff and score. A case missing the baseline output renders its other outputs without diffs and a `no baseline output` row.
+- `run(argv: string[], io: { stdout: { write(s: string): void }; stderr: { write(s: string): void } }): Promise<number>` reads exactly one file path with `node:fs/promises`, writes HTML to `io.stdout` and returns `0`. A usage error, file error or parse error writes to `io.stderr` and returns `2`.
+- `ViewerError` extends `Error` with `readonly code` one of `invalid_json`, `invalid_comparison`, `input_too_large`, `unknown_baseline`, `too_many_models`, `too_many_cases`.
 
-```sh
-npm install
-npm run check   # lint, format, types, tests with coverage, docs, secrets
-```
+## Why not git diff or a dashboard
 
-See [AGENTS.md](AGENTS.md) for the full command list and [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
+`git diff` and similar line-based tools do not align multiple model outputs against a baseline, and they show line changes rather than word changes in prose. A dashboard needs a server. This library produces a single escaped HTML file with word-level, multi-model, baseline-relative diffs.
 
-## License
+## Security
 
-[MIT](LICENSE) © 2026 Miguel Gomez
+See [docs/SECURITY.md](docs/SECURITY.md).
