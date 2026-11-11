@@ -1,0 +1,22 @@
+{
+  "title": "Demo comparison",
+  "baseline": "m1",
+  "cases": [
+    {
+      "id": "c1",
+      "prompt": "Summarize the following paragraph.",
+      "outputs": {
+        "m1": "the cat sat",
+        "m2": "the dog sat"
+      }
+    },
+    {
+      "id": "c2",
+      "prompt": "Name a color.",
+      "outputs": {
+        "m1": "blue",
+        "m2": "blue"
+      }
+    }
+  ]
+}
