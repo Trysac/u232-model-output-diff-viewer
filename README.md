@@ -4,9 +4,15 @@ Render outputs of several models for the same prompts as one static, script-free
 
 ## Installation
 
-```bash
-npm install @trysac/model-output-diff-viewer
+Not published to npm yet. Build it from a clone, then install it from the local path:
+
+```sh
+git clone https://github.com/Trysac/u232-model-output-diff-viewer.git
+cd u232-model-output-diff-viewer && npm ci && npm run build
+cd ../your-project && npm install ../u232-model-output-diff-viewer
 ```
+
+Imports keep the package name: `import { ... } from "@trysac/model-output-diff-viewer"`.
 
 ## Usage
 
